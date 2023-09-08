@@ -85,12 +85,27 @@ def tobs():
     return tobs_list
 
 @app.route("/api/v1.0/<start>")
-def start():
-    return ""
+def tobs_start(start):
+    stats= [
+    func.min(Measurement.tobs),   
+    func.max(Measurement.tobs),
+    func.avg(Measurement.tobs)
+    ]
+    tobs_stats = session.query(*stats).filter(Measurement.date >= start).all()
+    tobs_stats_list = list(np.ravel(tobs_stats))
+    return tobs_stats_list 
 
-@app.route("/api/v1.0/<start>/<end>")
-def Start_end():
-    return ""
+@app.route("/api/v1.0/<start>/<end>") 
+def tobs_start_end(start, end):
+    stats= [
+    func.min(Measurement.tobs),   
+    func.max(Measurement.tobs),
+    func.avg(Measurement.tobs)
+    ]
+    tobs_stats = session.query(*stats).filter(Measurement.date >= start, Measurement.date <= end).all()
+    tobs_stats_list = list(np.ravel(tobs_stats))
+    return tobs_stats_list  
+ 
 
 
     
