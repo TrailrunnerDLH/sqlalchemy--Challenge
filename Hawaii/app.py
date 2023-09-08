@@ -9,6 +9,8 @@ from sqlalchemy import create_engine, func
 from datetime import datetime
 import dateutil.relativedelta
 
+import numpy as np
+
 
 #################################################
 # Database Setup
@@ -66,7 +68,9 @@ def precipitation():
 
 @app.route("/api/v1.0/stations")    
 def stations():
-    return ""
+    station_count = session.query(Station.station).all()
+    station_list = list(np.ravel(station_count))
+    return station_list
 
 @app.route("/api/v1.0/tobs")
 def tobs():
