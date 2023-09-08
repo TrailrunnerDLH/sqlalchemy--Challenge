@@ -74,7 +74,15 @@ def stations():
 
 @app.route("/api/v1.0/tobs")
 def tobs():
-    return ""
+    last_result = session.query(Measurement).order_by(Measurement.date.desc()).first()
+    last_date = datetime.strptime(last_result.date, "%Y-%m-%d")
+    previous_date = last_date - dateutil.relativedelta.relativedelta(months=12)
+    station_activity = session.query(Measurement.station, func.count(Measurement.station)).group_by(Measurement.station).order_by(func.count(Measurement.station).desc()).all()
+    most_active_id = station_activity[0][0]
+    hist_data = session.query(Measurement.tobs).filter(Measurement.station==most_active_id, Measurement.date >= previous_date).all()
+    tobs_list = list(np.ravel(hist_data))
+
+    return tobs_list
 
 @app.route("/api/v1.0/<start>")
 def start():
