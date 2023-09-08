@@ -6,6 +6,10 @@ from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func
 
+from datetime import datetime
+import dateutil.relativedelta
+
+
 #################################################
 # Database Setup
 #################################################
@@ -39,17 +43,26 @@ app = Flask (__name__)
 def index():
     return (
         "Available Routes<br/>"
-        "/api/v1.0/precipitation/<br/>"
+        "/api/v1.0/precipitation<br/>"
         "/api/v1.0/stations<br/>"
         "/api/v1.0/tobs<br/>"
         "/api/v1.0/&lt;start&gt;<br/>"
         "/api/v1.0/&lt;start&gt;/&lt;end&gt;<br/>"
     )
             
-
-@app.route("/api/v1.0/precipitation/")
+@app.route("/api/v1.0/precipitation")
 def precipitation():
-    return "Hello World"
+    last_result = session.query(Measurement).order_by(Measurement.date.desc()).first()
+    last_date = datetime.strptime(last_result.date, "%Y-%m-%d")
+    previous_date = last_date - dateutil.relativedelta.relativedelta(months=12)
+    measurements = session.query(Measurement.date, Measurement.prcp).filter(Measurement.date >= previous_date).all()
+    
+    measure_dict = {}
+
+    for date, prcp in measurements:
+        if type (prcp) == float:
+            measure_dict[date]= prcp
+    return measure_dict
 
 @app.route("/api/v1.0/stations")    
 def stations():
