@@ -41,6 +41,9 @@ app = Flask (__name__)
 #################################################
 # Flask Routes
 #################################################
+
+
+# This route displays the available API URLs on the landing page. 
 @app.route("/")
 def index():
     return (
@@ -51,7 +54,8 @@ def index():
         "/api/v1.0/&lt;start&gt;<br/>"
         "/api/v1.0/&lt;start&gt;/&lt;end&gt;<br/>"
     )
-            
+
+# Created precipitation route that returns json with the date as the key and the value as the precipitation   
 @app.route("/api/v1.0/precipitation")
 def precipitation():
     last_result = session.query(Measurement).order_by(Measurement.date.desc()).first()
@@ -66,12 +70,15 @@ def precipitation():
             measure_dict[date]= prcp
     return measure_dict
 
+# Creates station route that returns jsonified data of all of the station names in the database
 @app.route("/api/v1.0/stations")    
 def stations():
-    station_count = session.query(Station.station).all()
-    station_list = list(np.ravel(station_count))
-    return station_list
+    station_list = session.query(Station.station).all() 
+    station_id = list(np.ravel(station_list))         
+    return station_id
+  
 
+# creates  return jsonified data for the most active station
 @app.route("/api/v1.0/tobs")
 def tobs():
     last_result = session.query(Measurement).order_by(Measurement.date.desc()).first()
